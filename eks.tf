@@ -44,4 +44,24 @@ module "eks" {
       desired_size = 2
     }
   }
+
+  # Cluster access entry
+  # To add the current caller identity as an administrator
+  access_entries = {
+    # One access entry with a policy associated
+    example = {
+      kubernetes_groups = []
+      principal_arn     = "arn:aws:sso:::permissionSet/ssoins-659506d4257a1c38/ps-619b8b29fea89ea3" # Replace with your IAM Role ARN
+
+      policy_associations = {
+        example = {
+          policy_arn = "arn:aws:iam::aws:policy/AmazonEKSClusterPolicy"
+          access_scope = {
+            namespaces = ["*"] # Grant access to all namespaces
+            type       = "cluster" # Grant access to the whole cluster
+          }
+        }
+      }
+    }
+  }
 }
