@@ -33,7 +33,7 @@ module "eks" {
   eks_managed_node_group_defaults = {
     ami_type               = "AL2_x86_64"
     instance_types         = ["t3.medium"]
-    vpc_security_group_ids = [] # Provide appropriate security group IDs if required
+    vpc_security_group_ids = [aws_security_group.eks_control_plane_sg.id]
   }
 
   # EKS Managed Node Groups
