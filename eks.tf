@@ -57,15 +57,16 @@ module "eks" {
     }
   }
 
+
+  enable_cluster_creator_admin_permissions = true
   access_entries = {
     example = {
       kubernetes_groups = []
-      principal_arn     = "arn:aws:iam::905418412366:sso-instance/AWSReservedSSO_shivanshset_804d182bd08ab8d1/sso-user/arati/f1939daa-80e1-7093-a34f-7b0334e29b02"
+      principal_arn     = aws_iam_role.eks_role.arn
       policy_associations = {
         example = {
-          policy_arn = "arn:aws:iam::aws:policy/AmazonEKSClusterPolicy"
+          policy_arn = "arn:aws:eks::aws:cluster-access-policy/AmazonEKSViewPolicy"
           access_scope = {
-            namespaces = ["*"]
             type       = "cluster"
           }
         }
