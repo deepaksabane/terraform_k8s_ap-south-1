@@ -1,0 +1,21 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: my-deployment         # Name of your deployment
+  namespace: default          # Namespace where the deployment will be created
+spec:
+  replicas: 3                 # Number of replicas (Pods) to create
+  selector:
+    matchLabels:
+      app: my-app             # Labels to match Pods created by this deployment
+  template:
+    metadata:
+      labels:
+        app: my-app           # Labels assigned to Pods created by this deployment
+    spec:
+      serviceAccountName: my-service-account  # Use the specified ServiceAccount
+      containers:
+        - name: my-app         # Container name
+          image: nginx:latest  # Example image, replace with your application's image
+          ports:
+            - containerPort: 80  # Port exposed by the container
