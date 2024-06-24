@@ -55,3 +55,7 @@ variable "cluster_version" {
     type = string 
 }
 
+# variable "map_public_ip_on_launch" {
+#   description = "Flag to map public IP on launch for instances in public subnets."
+#   type        = bool
+# }

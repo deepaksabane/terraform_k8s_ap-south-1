@@ -30,3 +30,15 @@ module "vpc" {
     "kubernetes.io/role/internal-elb" = "1"
   }
 }
+
+# module "public_subnets" {
+#   source  = "claranet/vpc-modules/aws//modules/public-subnets"
+#   version = "0.4.0"
+
+#   vpc_id                  = module.vpc.vpc_id
+#   gateway_id              = module.vpc.internet_gateway_id
+#   map_public_ip_on_launch = true
+#   cidr_block              = var.public_subnets[0] // Use the first subnet CIDR as an example
+#   subnet_count            = length(var.public_subnets)
+#   availability_zones      = var.azs
+# }
