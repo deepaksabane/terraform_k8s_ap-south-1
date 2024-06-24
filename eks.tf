@@ -1,6 +1,6 @@
 module "eks" {
   source  = "terraform-aws-modules/eks/aws"
-  version = "20.14.0"
+  version = "20.8.4"
 
   cluster_name                     = var.cluster_name
   cluster_version                  = var.cluster_version
@@ -12,16 +12,19 @@ module "eks" {
   cluster_enabled_log_types        = []
   create_cloudwatch_log_group      = true
   enable_irsa                      = true
+  depends_on = [
+    aws_iam_role.eks-iam-role,
+  ]
 
   cluster_addons = {
     coredns = {
-        most_recent = true
+      most_recent = true
     }
-    kube-proxy = {
-        most_recent = true
+    "kube-proxy" = {
+      most_recent = true
     }
-    vpc-cni = {
-        most_recent = true
+    "vpc-cni" = {
+      most_recent = true
     }
   }
 
@@ -29,36 +32,41 @@ module "eks" {
     Name = "dev"
   }
 
-  # EKS Managed Node Group Defaults
   eks_managed_node_group_defaults = {
     ami_type               = "AL2_x86_64"
     instance_types         = ["t3.medium"]
-    vpc_security_group_ids = [aws_security_group.eks_control_plane_sg.id]
+    node_role_arn          = aws_iam_role.workernodes.arn
+    vpc_security_group_ids = [aws_security_group.eks_control_plane_sg.id]  # Ensure this SG is defined
   }
 
-  # EKS Managed Node Groups
+  
   eks_managed_node_groups = {
     node_group = {
       min_size     = 2
       max_size     = 6
       desired_size = 2
+      tags = {
+        Name = "dev"
+      }
+      depends_on = [
+        aws_iam_role_policy_attachment.AmazonEKSWorkerNodePolicy,
+        aws_iam_role_policy_attachment.AmazonEKS_CNI_Policy,
+        module.vpc_id
+        #aws_iam_role_policy_attachment.AmazonEC2ContainerRegistryReadOnly,
+      ]
     }
   }
 
-  # Cluster access entry
-  # To add the current caller identity as an administrator
   access_entries = {
-    # One access entry with a policy associated
     example = {
       kubernetes_groups = []
-      principal_arn     = "arn:aws:sso:::permissionSet/ssoins-659506d4257a1c38/ps-619b8b29fea89ea3" # Replace with your IAM Role ARN
-
+      principal_arn     = "arn:aws:iam::905418412366:sso-instance/AWSReservedSSO_shivanshset_804d182bd08ab8d1/sso-user/arati/f1939daa-80e1-7093-a34f-7b0334e29b02"
       policy_associations = {
         example = {
           policy_arn = "arn:aws:iam::aws:policy/AmazonEKSClusterPolicy"
           access_scope = {
-            namespaces = ["*"] # Grant access to all namespaces
-            type       = "cluster" # Grant access to the whole cluster
+            namespaces = ["*"]
+            type       = "cluster"
           }
         }
       }
